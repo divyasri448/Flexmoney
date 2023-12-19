@@ -1,0 +1,305 @@
+Java Code ////
+
+1. Create a Spring Boot project named com.example.YogaStudents for a database application.
+2. In the parent package, the main class is automatically generated.
+3. In the parent package, create four additional packages:
+		a. com.example.YogaStudents.Entity - In this package, create a class named StudentsDetails.
+		b. com.example.YogaStudents.Controller - In this package, create a class named StudentMethods.
+		c. com.example.YogaStudents.Service - In this package, create a class named StudentService.
+		d. com.example.YogaStudents.Repository - In this package, create a interface named StudentRepository.
+		e. com.example.YogaStudents.configurations - In this package, create a class named Config.
+
+// Main class Code
+
+package com.example.YogaStudents;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class YogaStudentsDetailsApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(YogaStudentsDetailsApplication.class, args);
+	}
+
+}
+
+
+// StudentDetails Class Code
+package com.example.YogaStudents.Entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
+@Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "Yoga_Students_Details")
+public class StudentsDetails {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "Student_ID")
+	private Integer id;
+	@Column(name = "Student_Name")
+	private String name;
+	@Column(name = "Student+Batch Timings")
+	private String batch;
+	@Column(name = "Mobilr_Number")
+	private Long number;
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+	public Long getNumber() {
+		return number;
+	}
+	public void setId(Long number) {
+		this.number = number;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getBatch() {
+		return batch;
+	}
+	public void setBatch(String batch) {
+		this.batch = batch;
+	}
+	
+
+}
+// StudentRepository Interface code
+
+package com.example.YogaStudents.Repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.example.YogaStudents.Entity.StudentsDetails;
+
+@Repository
+public interface StudentRepository extends JpaRepository<StudentsDetails, Integer> {
+
+}
+
+// StudentMethods class code
+
+package com.example.YogaStudents.Controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.YogaStudents.Entity.StudentsDetails;
+import com.example.YogaStudents.Service.StudentService;
+//@CrossOrigin(origins = "http://localhost:3002")
+@RestController
+@RequestMapping("/api/vi")
+public class StudentMethods {
+	@Autowired
+	private StudentService service;
+	
+	@GetMapping("/FetchAll")
+	public List<StudentsDetails> getAllStudents()
+	{
+		return this.service.getAllStudentDetails();
+	}
+//	@CrossOrigin
+	@PostMapping("/InsertStudent")
+	public StudentsDetails SaveStudent(@RequestBody StudentsDetails details)
+	{
+		return this.service.saveStudent(details);
+	}
+
+}
+
+// StudentService class code
+
+package com.example.YogaStudents.Service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.YogaStudents.Entity.StudentsDetails;
+import com.example.YogaStudents.Repository.StudentRepository;
+@Service
+
+public class StudentService {
+	@Autowired
+	private StudentRepository repository;
+	
+	public List<StudentsDetails> getAllStudentDetails() {
+		// TODO Auto-generated method stub
+		return this.repository.findAll();
+	}
+
+	public StudentsDetails saveStudent(StudentsDetails details) {
+		// TODO Auto-generated method stub
+		return this.repository.save(details);
+	}
+
+}
+
+//Config class code
+
+package com.example.YogaStudents.configurations;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+@Configuration
+public class config {
+
+	
+
+
+	    @Bean
+	    public CorsFilter corsFilter() {
+	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+	        CorsConfiguration config = new CorsConfiguration();
+	        config.setAllowCredentials(true);
+	        config.addAllowedOrigin("http://localhost:3002"); // Replace with your front-end origin
+	        config.addAllowedHeader("*");
+	        config.addAllowedMethod("OPTIONS");
+	        config.addAllowedMethod("GET");
+	        config.addAllowedMethod("POST");
+	        config.addAllowedMethod("PUT");
+	        config.addAllowedMethod("DELETE");
+	        source.registerCorsConfiguration("/**", config);
+	        return new CorsFilter(source);
+	    }
+	}
+
+
+///// React Js code 
+
+import React, { useState } from 'react'
+import axios from "axios";
+
+
+const CreateForm = () => {
+    const [name,updateName]=useState('')
+    const [mobile,updateMobile]=useState('');
+    const [sessionTimings,UpdateSession]=useState('')
+    const[error,setError]=useState({
+        name:'',
+        mobile:'',
+        sessionTimings:''
+    })
+    function Validations(){
+        if(name.trim()==="")
+        {
+            setError({...error,name:"Please Enter Name"})
+        }
+        else{
+            setError({...error,name:""})
+        }
+    
+        if(mobile.trim()==="")
+        {
+            setError({...error,mobile:"Please Enter Mobile Number"})
+        }
+        else{
+            setError({...error,mobile:""})
+        }
+    
+        if(sessionTimings.trim()==="")
+        {
+            setError({...error,sessionTimings:"Please Select Session timings"})
+        }
+        else{
+            setError({...error,sessionTimings:""})
+        }
+    }
+    async function submitForm() {
+			Validations();
+        // If there are no validation errors, make the API call
+        if (!error.name && !error.mobile && !error.sessionTimings) {
+          try {
+            const response = await axios.post(
+              "http://10.0.0.105:8080/api/vi/InsertStudent",
+              {
+                name: name,
+                 mobile: mobile,
+                sessionTimings: sessionTimings,
+              }
+            );
+    
+            // Handle the response as needed
+            console.log("API Response:", response.data);
+          } catch (error) {
+            // Handle API call errors
+            console.error("API Error:", error.message);
+          }
+        }
+      }
+      return(
+        <>
+        <div className=" w-50 mt-5 m-auto p-7 h-auto" style={{gap:'20px'}}>
+            <h1 className="text-primary text-center">Admission Form</h1>
+            <div className="mt-3">
+                <label htmlFor="Name">Name</label>
+                <input type="text" className="form-control w-50 m-auto" placeholder="Enter Name" value={name}
+                onChange={(e)=>{
+                    updateName(e.target.value)
+                }}
+                />
+                {error.name && <span className="text-danger">{error.name}</span>}
+            </div>
+       
+             <div className="mt-3">
+                <label htmlFor="mobile">Mobile Number</label>
+                <input type="Number" className="form-control w-50 m-auto" placeholder="Enter Number" value={mobile}
+                onChange={(e)=>{
+                    updateMobile(e.target.value)
+                }}
+                />
+                {error.mobile && <span className="text-danger">{error.mobile}</span>}
+            </div> 
+            <div className="mt-3">
+            <label htmlFor="exampleFormControlSelect2">Session Timings</label>
+            
+            <select className="form-control w-50 m-auto" id="exampleFormControlSelect1" value={sessionTimings}
+            onChange={(e)=>{
+                    UpdateSession(e.target.value)
+            }} >
+            <option></option>
+            <option>5-6AM</option>
+            <option>6-7Am</option>
+            <option>7-8AM</option>
+            <option>8-9AM</option>
+            </select>
+            {error.sessionTimings && <span className="text-danger">{error.sessionTimings}</span>}
+            </div>
+            <div className="mt-3">
+               
+            <button type="button" className="btn btn-primary b-5" onClick={submitForm}>Submit</button>
+            </div>
+        </div>
+        </>
+    )
+}
+
+export default CreateForm
+
